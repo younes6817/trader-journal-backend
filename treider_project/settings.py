@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_user',
     'rest_framework',
+    "rest_framework_simplejwt.token_blacklist",
     'drf_spectacular',
+    'app_journal',
+    'app_transaction',
+    'app_goal',
 ]
 
 MIDDLEWARE = [
@@ -77,9 +81,13 @@ WSGI_APPLICATION = 'treider_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "treider_db",
+        "USER": "treider_user",
+        "PASSWORD": "traderpassword",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
@@ -128,6 +136,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'app_user.User'
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
@@ -136,3 +147,15 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API Documentation",
     "VERSION": "1.0.0",
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "your_email@gmail.com"
+EMAIL_HOST_PASSWORD = "your_app_password"
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

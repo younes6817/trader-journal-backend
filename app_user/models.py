@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -46,6 +48,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     image_profile = models.ImageField()
+
     phone = models.CharField(
         max_length=11,
         unique=True,
@@ -55,5 +58,34 @@ class User(AbstractUser):
             )
         ]
     )
+
+    email = models.EmailField(unique=True)
+
     USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["phone"]
+
     objects = UserManager()
+
+    def __str__(self):
+        return self.email
+
+
+
+class EmailVerificationCode(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="verification_codes"
+    )
+
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        return (
+            not self.is_used
+            and timezone.now() < self.expires_at
+        )
